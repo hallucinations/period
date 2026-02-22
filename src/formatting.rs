@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, NaiveDate, TimeZone};
 
 /// Converts a [`NaiveDate`] to an ISO 8601 date string (`YYYY-MM-DD`).
 #[must_use]
@@ -17,19 +17,29 @@ pub fn to_long_date(date: NaiveDate) -> String {
     date.format("%B %e, %Y").to_string()
 }
 
-/// Converts a [`DateTime<Local>`] to an RFC 3339 / ISO 8601 string
+/// Converts a [`DateTime`] to an RFC 3339 / ISO 8601 string
 /// (e.g. `"2026-02-22T14:30:00+05:30"`).
+///
+/// Accepts any timezone — [`chrono::Local`], [`chrono::Utc`], [`chrono::FixedOffset`], etc.
 #[must_use]
 #[inline]
-pub fn to_iso8601(datetime: DateTime<Local>) -> String {
+pub fn to_iso8601<Tz: TimeZone>(datetime: DateTime<Tz>) -> String
+where
+    Tz::Offset: std::fmt::Display,
+{
     datetime.to_rfc3339()
 }
 
-/// Converts a [`DateTime<Local>`] to an RFC 2822 string
+/// Converts a [`DateTime`] to an RFC 2822 string
 /// (e.g. `"Sun, 22 Feb 2026 14:30:00 -0600"`).
+///
+/// Accepts any timezone — [`chrono::Local`], [`chrono::Utc`], [`chrono::FixedOffset`], etc.
 #[must_use]
 #[inline]
-pub fn to_rfc2822(datetime: DateTime<Local>) -> String {
+pub fn to_rfc2822<Tz: TimeZone>(datetime: DateTime<Tz>) -> String
+where
+    Tz::Offset: std::fmt::Display,
+{
     datetime.to_rfc2822()
 }
 
@@ -75,5 +85,53 @@ mod tests {
             .unwrap();
         let result = to_rfc2822(datetime);
         assert!(result.starts_with("Sun, 22 Feb 2026 14:30:00"));
+    }
+
+    // -- timezone-aware tests using FixedOffset (deterministic, no Local) -----
+
+    #[test]
+    fn test_to_iso8601_utc() {
+        let tz = chrono::FixedOffset::east_opt(0).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00+00:00");
+    }
+
+    #[test]
+    fn test_to_iso8601_positive_offset() {
+        // UTC+5:30 (India)
+        let tz = chrono::FixedOffset::east_opt(5 * 3600 + 30 * 60).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00+05:30");
+    }
+
+    #[test]
+    fn test_to_iso8601_negative_offset() {
+        // UTC-6 (CST)
+        let tz = chrono::FixedOffset::west_opt(6 * 3600).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00-06:00");
+    }
+
+    #[test]
+    fn test_to_rfc2822_utc() {
+        let tz = chrono::FixedOffset::east_opt(0).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 +0000");
+    }
+
+    #[test]
+    fn test_to_rfc2822_positive_offset() {
+        // UTC+5:30 (India)
+        let tz = chrono::FixedOffset::east_opt(5 * 3600 + 30 * 60).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 +0530");
+    }
+
+    #[test]
+    fn test_to_rfc2822_negative_offset() {
+        // UTC-6 (CST)
+        let tz = chrono::FixedOffset::west_opt(6 * 3600).unwrap();
+        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 -0600");
     }
 }
