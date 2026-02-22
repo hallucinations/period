@@ -1,11 +1,11 @@
 use chrono::{DateTime, Duration, Local, Months, NaiveDate};
 use crate::error::TempusError;
 
-fn validate_positive(value: i64, unit: &str, suggestion: &'static str) -> Result<(), TempusError> {
+fn validate_positive(value: i64, unit: &'static str, suggestion: &'static str) -> Result<(), TempusError> {
     if value < 0 {
         return Err(TempusError::NegativeValue {
-            unit: unit.to_string(),
-            suggestion: suggestion.to_string(),
+            unit,
+            suggestion,
             value: -value,
         });
     }
@@ -25,7 +25,6 @@ pub fn seconds_ago(seconds: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(seconds, "seconds", "seconds_from_now")?;
     Ok(Local::now() - Duration::seconds(seconds))
 }
-
 
 /// Returns the local date-time `seconds` seconds in the future.
 ///
@@ -180,7 +179,7 @@ pub fn tomorrow() -> NaiveDate {
 pub fn months_ago(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_from_now")?;
     let months_u32 = u32::try_from(months).map_err(|_| TempusError::Overflow {
-        unit: "months".to_string(),
+        unit: "months",
         value: months,
     })?;
     Ok(Local::now().date_naive() - Months::new(months_u32))
@@ -199,7 +198,7 @@ pub fn months_ago(months: i64) -> Result<NaiveDate, TempusError> {
 pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_ago")?;
     let months_u32 = u32::try_from(months).map_err(|_| TempusError::Overflow {
-        unit: "months".to_string(),
+        unit: "months",
         value: months,
     })?;
     Ok(Local::now().date_naive() + Months::new(months_u32))
@@ -217,11 +216,11 @@ pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
 #[inline]
 pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_from_now")?;
-    let months = i32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
-        unit: "months".to_string(),
-        value: years.saturating_mul(12),
+    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
+        unit: "years",
+        value: years,
     })?;
-    Ok(Local::now().date_naive() - Months::new(months as u32))
+    Ok(Local::now().date_naive() - Months::new(months))
 }
 
 /// Returns the local date `years` calendar years in the future.
@@ -236,16 +235,26 @@ pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
 #[inline]
 pub fn years_from_now(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_ago")?;
-    let months = i32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
-        unit: "months".to_string(),
-        value: years.saturating_mul(12),
+    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
+        unit: "years",
+        value: years,
     })?;
-    Ok(Local::now().date_naive() + Months::new(months as u32))
+    Ok(Local::now().date_naive() + Months::new(months))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use chrono::{Duration, Local, Months};
+    use crate::{
+        seconds_ago, seconds_from_now,
+        minutes_ago, minutes_from_now,
+        hours_ago, hours_from_now,
+        days_ago, days_from_now,
+        weeks_ago, weeks_from_now,
+        yesterday, tomorrow,
+        months_ago, months_from_now,
+        years_ago, years_from_now
+    };
 
     #[test]
     fn test_seconds_ago_returns_correct_datetime() {
