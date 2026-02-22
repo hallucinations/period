@@ -154,3 +154,24 @@ Keep the dependency count minimal. Avoid adding new dependencies unless they pro
 2. **Explicit over implicit** — negative values are rejected with a helpful suggestion rather than silently negated.
 3. **Zero heap allocation on error path** — all error fields are `&'static str` or primitive integers.
 4. **Composable** — errors implement `std::error::Error` and integrate with the broader Rust error ecosystem.
+
+## Roadmap
+
+### Next: Ruby bindings via magnus
+
+The immediate next goal is exposing this library to Ruby using [magnus](https://github.com/matsadler/magnus), enabling expressions like:
+
+```ruby
+Period.today             # => Date
+Period.now               # => DateTime
+Period.yesterday         # => Date
+Period.tomorrow          # => Date
+Period.days_ago(3)       # => Date
+Period.weeks_from_now(2) # => Date
+```
+
+### Longer term
+
+- **`humanize`** — convert a date/time to a human-readable string ("2 days ago", "just now", "last month")
+- **`beginning_of` / `end_of`** — start and end of a week, month, or year
+- **Natural language parsing** — `Period.parse("3 months from now")`
