@@ -202,6 +202,52 @@ pub fn days_from_now(days: i64) -> Result<NaiveDate, PeriodError> {
         })
 }
 
+/// Returns the local date-time `days` days in the past, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`days_ago`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `days` is negative.
+/// Returns [`PeriodError::Overflow`] if the resulting date-time is out of range.
+/// Use [`days_from_now_datetime`] for future offsets.
+#[inline]
+pub fn days_ago_datetime(days: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(days, "days", "days_from_now_datetime")?;
+    let duration = Duration::try_days(days).ok_or(PeriodError::Overflow {
+        unit: "days",
+        value: days,
+    })?;
+    Local::now()
+        .checked_sub_signed(duration)
+        .ok_or(PeriodError::Overflow {
+            unit: "days",
+            value: days,
+        })
+}
+
+/// Returns the local date-time `days` days in the future, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`days_from_now`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `days` is negative.
+/// Returns [`PeriodError::Overflow`] if the resulting date-time is out of range.
+/// Use [`days_ago_datetime`] for past offsets.
+#[inline]
+pub fn days_from_now_datetime(days: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(days, "days", "days_ago_datetime")?;
+    let duration = Duration::try_days(days).ok_or(PeriodError::Overflow {
+        unit: "days",
+        value: days,
+    })?;
+    Local::now()
+        .checked_add_signed(duration)
+        .ok_or(PeriodError::Overflow {
+            unit: "days",
+            value: days,
+        })
+}
+
 /// Returns the local date `weeks` weeks in the past.
 ///
 /// A value of `0` returns today.
@@ -243,6 +289,52 @@ pub fn weeks_from_now(weeks: i64) -> Result<NaiveDate, PeriodError> {
     })?;
     Local::now()
         .date_naive()
+        .checked_add_signed(duration)
+        .ok_or(PeriodError::Overflow {
+            unit: "weeks",
+            value: weeks,
+        })
+}
+
+/// Returns the local date-time `weeks` weeks in the past, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`weeks_ago`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `weeks` is negative.
+/// Returns [`PeriodError::Overflow`] if the resulting date-time is out of range.
+/// Use [`weeks_from_now_datetime`] for future offsets.
+#[inline]
+pub fn weeks_ago_datetime(weeks: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(weeks, "weeks", "weeks_from_now_datetime")?;
+    let duration = Duration::try_weeks(weeks).ok_or(PeriodError::Overflow {
+        unit: "weeks",
+        value: weeks,
+    })?;
+    Local::now()
+        .checked_sub_signed(duration)
+        .ok_or(PeriodError::Overflow {
+            unit: "weeks",
+            value: weeks,
+        })
+}
+
+/// Returns the local date-time `weeks` weeks in the future, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`weeks_from_now`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `weeks` is negative.
+/// Returns [`PeriodError::Overflow`] if the resulting date-time is out of range.
+/// Use [`weeks_ago_datetime`] for past offsets.
+#[inline]
+pub fn weeks_from_now_datetime(weeks: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(weeks, "weeks", "weeks_ago_datetime")?;
+    let duration = Duration::try_weeks(weeks).ok_or(PeriodError::Overflow {
+        unit: "weeks",
+        value: weeks,
+    })?;
+    Local::now()
         .checked_add_signed(duration)
         .ok_or(PeriodError::Overflow {
             unit: "weeks",
@@ -323,6 +415,52 @@ pub fn months_from_now(months: i64) -> Result<NaiveDate, PeriodError> {
         })
 }
 
+/// Returns the local date-time `months` calendar months in the past, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`months_ago`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `months` is negative.
+/// Returns [`PeriodError::Overflow`] if `months` exceeds [`u32::MAX`] or the resulting date-time is out of range.
+/// Use [`months_from_now_datetime`] for future offsets.
+#[inline]
+pub fn months_ago_datetime(months: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(months, "months", "months_from_now_datetime")?;
+    let months_u32 = u32::try_from(months).map_err(|_| PeriodError::Overflow {
+        unit: "months",
+        value: months,
+    })?;
+    Local::now()
+        .checked_sub_months(Months::new(months_u32))
+        .ok_or(PeriodError::Overflow {
+            unit: "months",
+            value: months,
+        })
+}
+
+/// Returns the local date-time `months` calendar months in the future, preserving the time-of-day component.
+///
+/// A value of `0` returns the current date-time. Use [`months_from_now`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `months` is negative.
+/// Returns [`PeriodError::Overflow`] if `months` exceeds [`u32::MAX`] or the resulting date-time is out of range.
+/// Use [`months_ago_datetime`] for past offsets.
+#[inline]
+pub fn months_from_now_datetime(months: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(months, "months", "months_ago_datetime")?;
+    let months_u32 = u32::try_from(months).map_err(|_| PeriodError::Overflow {
+        unit: "months",
+        value: months,
+    })?;
+    Local::now()
+        .checked_add_months(Months::new(months_u32))
+        .ok_or(PeriodError::Overflow {
+            unit: "months",
+            value: months,
+        })
+}
+
 /// Returns the local date `years` calendar years in the past.
 ///
 /// Internally converts years to months. A value of `0` returns today.
@@ -364,6 +502,54 @@ pub fn years_from_now(years: i64) -> Result<NaiveDate, PeriodError> {
     })?;
     Local::now()
         .date_naive()
+        .checked_add_months(Months::new(months))
+        .ok_or(PeriodError::Overflow {
+            unit: "years",
+            value: years,
+        })
+}
+
+/// Returns the local date-time `years` calendar years in the past, preserving the time-of-day component.
+///
+/// Internally converts years to months. A value of `0` returns the current date-time.
+/// Use [`years_ago`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `years` is negative.
+/// Returns [`PeriodError::Overflow`] if the equivalent month count overflows or the resulting date-time is out of range.
+/// Use [`years_from_now_datetime`] for future offsets.
+#[inline]
+pub fn years_ago_datetime(years: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(years, "years", "years_from_now_datetime")?;
+    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| PeriodError::Overflow {
+        unit: "years",
+        value: years,
+    })?;
+    Local::now()
+        .checked_sub_months(Months::new(months))
+        .ok_or(PeriodError::Overflow {
+            unit: "years",
+            value: years,
+        })
+}
+
+/// Returns the local date-time `years` calendar years in the future, preserving the time-of-day component.
+///
+/// Internally converts years to months. A value of `0` returns the current date-time.
+/// Use [`years_from_now`] when you only need the date.
+///
+/// # Errors
+/// Returns [`PeriodError::NegativeValue`] if `years` is negative.
+/// Returns [`PeriodError::Overflow`] if the equivalent month count overflows or the resulting date-time is out of range.
+/// Use [`years_ago_datetime`] for past offsets.
+#[inline]
+pub fn years_from_now_datetime(years: i64) -> Result<DateTime<Local>, PeriodError> {
+    validate_non_negative(years, "years", "years_ago_datetime")?;
+    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| PeriodError::Overflow {
+        unit: "years",
+        value: years,
+    })?;
+    Local::now()
         .checked_add_months(Months::new(months))
         .ok_or(PeriodError::Overflow {
             unit: "years",
@@ -915,6 +1101,246 @@ mod tests {
             years_from_now(-2).unwrap_err().to_string(),
             "years must be positive. Did you mean years_ago(2)?"
         );
+    }
+
+    // ── days/weeks/months/years datetime variants ─────────────────────────
+
+    #[test]
+    fn test_days_ago_datetime_returns_correct_datetime() {
+        let lower = Local::now() - Duration::days(3);
+        let result = days_ago_datetime(3).unwrap();
+        let upper = Local::now() - Duration::days(3);
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_days_ago_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = days_ago_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_days_ago_datetime_negative_returns_error() {
+        assert_eq!(
+            days_ago_datetime(-3).unwrap_err().to_string(),
+            "days must be positive. Did you mean days_from_now_datetime(3)?"
+        );
+    }
+
+    #[test]
+    fn test_days_ago_datetime_overflow_returns_error() {
+        assert!(days_ago_datetime(200_000_000).is_err());
+    }
+
+    #[test]
+    fn test_days_from_now_datetime_returns_correct_datetime() {
+        let lower = Local::now() + Duration::days(3);
+        let result = days_from_now_datetime(3).unwrap();
+        let upper = Local::now() + Duration::days(3);
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_days_from_now_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = days_from_now_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_days_from_now_datetime_negative_returns_error() {
+        assert_eq!(
+            days_from_now_datetime(-3).unwrap_err().to_string(),
+            "days must be positive. Did you mean days_ago_datetime(3)?"
+        );
+    }
+
+    #[test]
+    fn test_days_from_now_datetime_overflow_returns_error() {
+        assert!(days_from_now_datetime(200_000_000).is_err());
+    }
+
+    #[test]
+    fn test_weeks_ago_datetime_returns_correct_datetime() {
+        let lower = Local::now() - Duration::weeks(2);
+        let result = weeks_ago_datetime(2).unwrap();
+        let upper = Local::now() - Duration::weeks(2);
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_weeks_ago_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = weeks_ago_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_weeks_ago_datetime_negative_returns_error() {
+        assert_eq!(
+            weeks_ago_datetime(-2).unwrap_err().to_string(),
+            "weeks must be positive. Did you mean weeks_from_now_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_weeks_from_now_datetime_returns_correct_datetime() {
+        let lower = Local::now() + Duration::weeks(2);
+        let result = weeks_from_now_datetime(2).unwrap();
+        let upper = Local::now() + Duration::weeks(2);
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_weeks_from_now_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = weeks_from_now_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_weeks_from_now_datetime_negative_returns_error() {
+        assert_eq!(
+            weeks_from_now_datetime(-2).unwrap_err().to_string(),
+            "weeks must be positive. Did you mean weeks_ago_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_months_ago_datetime_returns_correct_datetime() {
+        let lower = Local::now().checked_sub_months(Months::new(2)).unwrap();
+        let result = months_ago_datetime(2).unwrap();
+        let upper = Local::now().checked_sub_months(Months::new(2)).unwrap();
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_months_ago_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = months_ago_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_months_ago_datetime_negative_returns_error() {
+        assert_eq!(
+            months_ago_datetime(-2).unwrap_err().to_string(),
+            "months must be positive. Did you mean months_from_now_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_months_ago_datetime_overflow_returns_error() {
+        assert!(months_ago_datetime(5_000_000_000).is_err());
+    }
+
+    #[test]
+    fn test_months_from_now_datetime_returns_correct_datetime() {
+        let lower = Local::now().checked_add_months(Months::new(2)).unwrap();
+        let result = months_from_now_datetime(2).unwrap();
+        let upper = Local::now().checked_add_months(Months::new(2)).unwrap();
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_months_from_now_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = months_from_now_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_months_from_now_datetime_negative_returns_error() {
+        assert_eq!(
+            months_from_now_datetime(-2).unwrap_err().to_string(),
+            "months must be positive. Did you mean months_ago_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_months_from_now_datetime_overflow_returns_error() {
+        assert!(months_from_now_datetime(5_000_000_000).is_err());
+    }
+
+    #[test]
+    fn test_years_ago_datetime_returns_correct_datetime() {
+        let lower = Local::now().checked_sub_months(Months::new(24)).unwrap();
+        let result = years_ago_datetime(2).unwrap();
+        let upper = Local::now().checked_sub_months(Months::new(24)).unwrap();
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_years_ago_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = years_ago_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_years_ago_datetime_negative_returns_error() {
+        assert_eq!(
+            years_ago_datetime(-2).unwrap_err().to_string(),
+            "years must be positive. Did you mean years_from_now_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_years_ago_datetime_overflow_returns_error() {
+        assert!(years_ago_datetime(1_000_000_000).is_err());
+    }
+
+    #[test]
+    fn test_years_from_now_datetime_returns_correct_datetime() {
+        let lower = Local::now().checked_add_months(Months::new(24)).unwrap();
+        let result = years_from_now_datetime(2).unwrap();
+        let upper = Local::now().checked_add_months(Months::new(24)).unwrap();
+        assert!(result >= lower);
+        assert!(result <= upper);
+    }
+
+    #[test]
+    fn test_years_from_now_datetime_with_zero_returns_now() {
+        let before = Local::now();
+        let result = years_from_now_datetime(0).unwrap();
+        let after = Local::now();
+        assert!(result >= before);
+        assert!(result <= after);
+    }
+
+    #[test]
+    fn test_years_from_now_datetime_negative_returns_error() {
+        assert_eq!(
+            years_from_now_datetime(-2).unwrap_err().to_string(),
+            "years must be positive. Did you mean years_ago_datetime(2)?"
+        );
+    }
+
+    #[test]
+    fn test_years_from_now_datetime_overflow_returns_error() {
+        assert!(years_from_now_datetime(1_000_000_000).is_err());
     }
 
     // ── humanize ────────────────────────────────────────────────────────────
