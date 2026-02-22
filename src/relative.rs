@@ -272,10 +272,7 @@ pub fn yesterday() -> NaiveDate {
 #[must_use]
 #[inline]
 pub fn tomorrow() -> NaiveDate {
-    Local::now()
-        .date_naive()
-        .succ_opt()
-        .expect("date overflow")
+    Local::now().date_naive().succ_opt().expect("date overflow")
 }
 
 /// Returns the local date `months` calendar months in the past.
