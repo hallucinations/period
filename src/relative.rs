@@ -32,6 +32,14 @@ pub fn months_from_now(months: u32) -> NaiveDate {
     Local::now().date_naive() + Months::new(months)
 }
 
+pub fn years_ago(years: u32) -> NaiveDate {
+    months_ago(years * 12)
+}
+
+pub fn years_from_now(years: u32) -> NaiveDate {
+    months_from_now(years * 12)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -97,6 +105,20 @@ mod tests {
     fn test_months_from_now_returns_correct_date() {
         let date = months_from_now(2);
         let expected = Local::now().date_naive() + Months::new(2);
+        assert_eq!(date, expected);
+    }
+
+    #[test]
+    fn test_years_ago_returns_correct_date() {
+        let date = years_ago(2);
+        let expected = months_ago(24);
+        assert_eq!(date, expected);
+    }
+
+    #[test]
+    fn test_years_from_now_returns_correct_date() {
+        let date = years_from_now(2);
+        let expected = months_from_now(24);
         assert_eq!(date, expected);
     }
 }

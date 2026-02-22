@@ -6,5 +6,6 @@ pub use relative::{
     days_ago, days_from_now,
     weeks_ago, weeks_from_now,
     yesterday, tomorrow,
-    months_ago, months_from_now
+    months_ago, months_from_now,
+    years_ago, years_from_now,
 };
