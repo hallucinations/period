@@ -8,7 +8,7 @@ keywords = ["date", "time", "datetime", "chrono", "relative"]
 categories = ["date-and-time"]
 readme = "README.md"
 repository = "https://github.com/vasanth/tempus"
-rust-version = "1.75"
+rust-version = "1.85"
 
 [dependencies]
 chrono = "0.4"
@@ -17,7 +17,7 @@ chrono = "0.4"
 unused = "warn"
 
 [lints.clippy]
-all = "warn"
-pedantic = "warn"
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
 # allow these pedantic lints that are too noisy for this crate
 module_name_repetitions = "allow"
