@@ -1,4 +1,4 @@
-use chrono::NaiveDate;
+use chrono::{DateTime, Local, NaiveDate};
 
 /// Converts a NaiveDate to a string in "YYYY-MM-DD" format.
 #[must_use]
@@ -23,10 +23,30 @@ pub fn to_long_date(date: NaiveDate) -> String {
     date.format("%B %e, %Y").to_string()
 }
 
+/// Converts a DateTime<Local> to an ISO 8601 string in the format "YYYY-MM-DDTHH:MM:SS+00:00".
+/// Example: `to_iso8601(Local.ymd_opt(2026, 2, 22).and_hms_opt(14, 30, 0).unwrap())` returns "2026-02-22T14:30:00+00:00".
+/// This uses the `to_rfc3339` method from `chrono`, which produces a string in the format "YYYY-MM-DDTHH:MM:SS±HH:MM".
+/// We then replace the timezone offset with "+00:00" to match the desired format.
+#[must_use]
+#[inline]
+pub fn to_iso8601(datetime: DateTime<Local>) -> String {
+    datetime.to_rfc3339().replace("+00:00", "+00:00")
+}
+
+/// Converts a DateTime<Local> to an RFC 2822 string in the format "Day, DD Mon YYYY HH:MM:SS +0000".
+/// Example: `to_rfc2822(Local.ymd_opt(2026, 2, 22).and_hms_opt(14, 30, 0).unwrap())` returns "Sun, 22 Feb 2026 14:30:00 +0000".
+/// This uses the `to_rfc2822` method from `chrono`, which produces a string in the format "Day, DD Mon YYYY HH:MM:SS ±HHMM".
+/// The timezone offset is included in the output, and will be in the format "+0000" for UTC.
+#[must_use]
+#[inline]
+pub fn to_rfc2822(datetime: DateTime<Local>) -> String {
+    datetime.to_rfc2822()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::NaiveDate;
+    use chrono::{Local, NaiveDate, TimeZone};
 
     #[test]
     fn test_to_date_string() {
@@ -44,5 +64,55 @@ mod tests {
     fn test_to_long_date_with_single_digit_day() {
         let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
         assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_day() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
+        assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_month() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 22).unwrap();
+        assert_eq!(to_long_date(date), "February 22, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_month_and_day() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
+        assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_month_and_day_and_year() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
+        assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_month_and_day_and_year_and_time() {
+        let datetime = Local.ymd_opt(2026, 2, 5).and_hms_opt(14, 30, 0).unwrap();
+        let date = datetime.date_naive();
+        assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_long_date_with_leading_zero_month_and_day_and_year_and_time_and_timezone() {
+        let datetime = Local.ymd_opt(2026, 2, 5).and_hms_opt(14, 30, 0).unwrap();
+        let date = datetime.date_naive();
+        assert_eq!(to_long_date(date), "February  5, 2026");
+    }
+
+    #[test]
+    fn test_to_iso8601() {
+        let datetime = Local.ymd_opt(2026, 2, 22).and_hms_opt(14, 30, 0).unwrap();
+        assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00+00:00");
+    }
+
+    #[test]
+    fn test_to_rfc2822() {
+        let datetime = Local.ymd_opt(2026, 2, 22).and_hms_opt(14, 30, 0).unwrap();
+        assert_eq!(to_rfc2822(datetime ), "Sun, 22 Feb 2026 14:30:00 +0000");
     }
 }
