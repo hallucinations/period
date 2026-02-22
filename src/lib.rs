@@ -1,5 +1,5 @@
-pub mod now;
-pub mod relative;
+mod now;
+mod relative;
 
 pub use now::{now, today};
 pub use relative::{
