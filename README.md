@@ -13,16 +13,18 @@ A human-friendly date and time library for Rust.
 
 Period provides an expressive, readable API for common date and time operations. Instead of wrestling with offsets and arithmetic, you write code that reads like English.
 
-```rust
-use period::{today, yesterday, days_ago, weeks_from_now, months_ago, humanize};
-use period::now;
+Every relative function returns a `Relative` value — a thin wrapper around `DateTime<Local>` — which you convert to whichever representation you need:
 
-let today     = today();
-let yesterday = yesterday();
-let past      = days_ago(3)?;
-let future    = weeks_from_now(2)?;
-let earlier   = months_ago(6)?;
-let label     = humanize(now()); // "just now"
+```rust
+use period::{today, yesterday, days_ago, weeks_from_now, months_ago, hours_ago, humanize, now};
+
+let today     = today();                             // NaiveDate
+let yesterday = yesterday();                         // NaiveDate
+let past      = days_ago(3)?.as_date();              // NaiveDate
+let future    = weeks_from_now(2)?.as_date();        // NaiveDate
+let earlier   = months_ago(6)?.as_datetime();        // DateTime<Local>
+let earlier   = hours_ago(4)?.as_time();             // NaiveTime (time-of-day only)
+let label     = humanize(now());                     // "just now"
 ```
 
 ---
@@ -58,38 +60,55 @@ let yesterday = yesterday(); // NaiveDate
 let tomorrow  = tomorrow();  // NaiveDate
 ```
 
-### Relative dates
+### Relative values
 
-All relative functions return `Result<NaiveDate, PeriodError>` and reject negative values with a helpful error message.
+All relative functions return `Result<Relative, PeriodError>`. Call `.as_date()`, `.as_datetime()`, or `.as_time()` on the result to extract the representation you need.
 
 ```rust
 use period::{days_ago, days_from_now, weeks_ago, weeks_from_now,
-             months_ago, months_from_now, years_ago, years_from_now};
-
-let d = days_ago(7)?;          // 7 days in the past
-let d = days_from_now(30)?;    // 30 days in the future
-let d = weeks_ago(2)?;         // 2 weeks in the past
-let d = weeks_from_now(4)?;    // 4 weeks in the future
-let d = months_ago(3)?;        // 3 calendar months in the past
-let d = months_from_now(6)?;   // 6 calendar months in the future
-let d = years_ago(1)?;         // 1 year in the past
-let d = years_from_now(5)?;    // 5 years in the future
-```
-
-### Relative times
-
-These return `Result<DateTime<Local>, PeriodError>`.
-
-```rust
-use period::{seconds_ago, seconds_from_now, minutes_ago, minutes_from_now,
+             months_ago, months_from_now, years_ago, years_from_now,
+             seconds_ago, seconds_from_now, minutes_ago, minutes_from_now,
              hours_ago, hours_from_now};
 
-let t = seconds_ago(30)?;        // 30 seconds in the past
-let t = seconds_from_now(10)?;   // 10 seconds in the future
-let t = minutes_ago(15)?;        // 15 minutes in the past
-let t = minutes_from_now(45)?;   // 45 minutes in the future
-let t = hours_ago(2)?;           // 2 hours in the past
-let t = hours_from_now(8)?;      // 8 hours in the future
+// Dates
+let d = days_ago(7)?.as_date();           // NaiveDate — 7 days in the past
+let d = days_from_now(30)?.as_date();     // NaiveDate — 30 days in the future
+let d = weeks_ago(2)?.as_date();          // NaiveDate — 2 weeks in the past
+let d = weeks_from_now(4)?.as_date();     // NaiveDate — 4 weeks in the future
+let d = months_ago(3)?.as_date();         // NaiveDate — 3 calendar months in the past
+let d = months_from_now(6)?.as_date();    // NaiveDate — 6 calendar months in the future
+let d = years_ago(1)?.as_date();          // NaiveDate — 1 year in the past
+let d = years_from_now(5)?.as_date();     // NaiveDate — 5 years in the future
+
+// DateTimes
+let t = seconds_ago(30)?.as_datetime();       // DateTime<Local> — 30 seconds ago
+let t = seconds_from_now(10)?.as_datetime();  // DateTime<Local> — 10 seconds from now
+let t = minutes_ago(15)?.as_datetime();       // DateTime<Local> — 15 minutes ago
+let t = minutes_from_now(45)?.as_datetime();  // DateTime<Local> — 45 minutes from now
+let t = hours_ago(2)?.as_datetime();          // DateTime<Local> — 2 hours ago
+let t = hours_from_now(8)?.as_datetime();     // DateTime<Local> — 8 hours from now
+
+// Time-of-day only
+let t = hours_ago(1)?.as_time(); // NaiveTime
+```
+
+### The `Relative` type
+
+`Relative` is a `Copy` wrapper around `DateTime<Local>` with three conversion methods:
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `.as_datetime()` | `DateTime<Local>` | Full date and time with timezone |
+| `.as_date()` | `NaiveDate` | Calendar date only |
+| `.as_time()` | `NaiveTime` | Time-of-day only |
+
+`From<Relative>` is implemented for all three types, so you can use `.into()` or type inference in assignments:
+
+```rust
+use period::days_ago;
+use chrono::NaiveDate;
+
+let date: NaiveDate = days_ago(10)?.into();
 ```
 
 ### Humanize
@@ -105,6 +124,14 @@ println!("{}", humanize(dt)); // "35 minutes ago"
 
 let dt = Local::now() + chrono::Duration::hours(2);
 println!("{}", humanize(dt)); // "in 2 hours"
+```
+
+You can also pass the inner datetime from a `Relative` value:
+
+```rust
+use period::{hours_ago, humanize};
+
+let label = humanize(hours_ago(3)?.as_datetime()); // "3 hours ago"
 ```
 
 | Absolute delta | Past              | Future           |
@@ -125,7 +152,7 @@ println!("{}", humanize(dt)); // "in 2 hours"
 
 ## Error handling
 
-All fallible functions return `Result<T, PeriodError>`. The error type is inspectable — you can match on specific variants:
+All fallible functions return `Result<_, PeriodError>`. The error type is inspectable — you can match on specific variants:
 
 ```rust
 use period::{days_ago, PeriodError};
@@ -137,7 +164,7 @@ match days_ago(-5) {
     Err(PeriodError::Overflow { unit, value }) => {
         println!("{} value {} is too large", unit, value);
     }
-    Ok(date) => println!("{}", date),
+    Ok(relative) => println!("{}", relative.as_date()),
 }
 ```
 
