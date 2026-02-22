@@ -116,6 +116,8 @@ mod tests {
 
     #[test]
     fn test_days_ago_overflow_returns_error() {
+        // chrono's NaiveDate range is ±~262,000 years (~95,000,000 days);
+        // 200_000_000 days exceeds that limit and must overflow.
         assert!(days_ago(200_000_000).is_err());
     }
 
@@ -153,6 +155,8 @@ mod tests {
 
     #[test]
     fn test_days_from_now_overflow_returns_error() {
+        // chrono's NaiveDate range is ±~262,000 years (~95,000,000 days);
+        // 200_000_000 days exceeds that limit and must overflow.
         assert!(days_from_now(200_000_000).is_err());
     }
 
