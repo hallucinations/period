@@ -439,4 +439,28 @@ mod tests {
         let result = humanize(r.into());
         assert!(result.starts_with("in "), "expected 'in …', got: {result}");
     }
+
+    // -- extreme values -------------------------------------------------------
+
+    #[test]
+    fn test_humanize_extreme_past_is_n_years_ago() {
+        // Use a large but representable second count (1000 years ≈ 31_557_600_000 s).
+        // Exercises the ">= 18 months" else branch and saturating_abs on large i64 values.
+        let secs: i64 = 1_000 * 365 * 86_400;
+        let result = h_past(secs);
+        assert!(
+            result.ends_with("years ago"),
+            "expected 'N years ago', got: {result}"
+        );
+    }
+
+    #[test]
+    fn test_humanize_extreme_future_is_in_n_years() {
+        let secs: i64 = 1_000 * 365 * 86_400;
+        let result = h_future(secs);
+        assert!(
+            result.starts_with("in ") && result.ends_with("years"),
+            "expected 'in N years', got: {result}"
+        );
+    }
 }
