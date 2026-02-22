@@ -153,6 +153,13 @@ let label = humanize(hours_ago(3)?.as_datetime()); // "3 hours ago"
 | < 18 months    | `"a year ago"`    | `"in a year"`    |
 | ≥ 18 months    | `"N years ago"`   | `"in N years"`   |
 
+> **Note:** The `< 90 s` bucket uses the article form (`"a minute ago"`). Values in
+> the `< 45 min` bucket that round to `n = 1` produce `"1 minute ago"`, so the
+> transition at 90 s is `"a minute ago"` → `"1 minute ago"` → `"2 minutes ago"`.
+>
+> **Note:** `"yesterday"` / `"tomorrow"` are triggered by elapsed seconds (22–35 h),
+> not by calendar-day boundaries. Months are approximated as 30 days.
+
 ---
 
 ## Error handling
