@@ -246,7 +246,6 @@ pub fn years_from_now(years: i64) -> Result<NaiveDate, TempusError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Local;
 
     #[test]
     fn test_seconds_ago_returns_correct_datetime() {
