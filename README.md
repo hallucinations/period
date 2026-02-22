@@ -10,6 +10,10 @@ A human-friendly date and time library for Rust.
 
 ---
 
+> **Note:** Period is a learning project, built to explore the Rust ecosystem and the process of authoring Ruby extensions from Rust. Its public API is intentionally expressive, but the implementation is a thin layer over [chrono](https://docs.rs/chrono) with no additional performance guarantees, hardening, or production-level validation. If you need reliable, well-tested date and time handling in production, use `chrono` directly or a library with a longer track record. That said, if the API style appeals to you, you are welcome to use it — just do so with that context in mind.
+
+---
+
 ## Overview
 
 Period provides an expressive, readable API for common date and time operations. Instead of wrestling with offsets and arithmetic, you write code that reads like English.
