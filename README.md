@@ -4,7 +4,7 @@ A human-friendly date and time library for Rust.
 
 [![Rust](https://img.shields.io/badge/rust-1.93%2B-orange.svg)](https://www.rust-lang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/vasanth/period/actions/workflows/ci.yml/badge.svg)](https://github.com/vasanth/period/actions/workflows/ci.yml)
+[![CI](https://github.com/hallucinations/period/actions/workflows/ci.yml/badge.svg)](https://github.com/hallucinations/period/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/period.svg)](https://crates.io/crates/period)
 
 ---
