@@ -123,21 +123,30 @@ mod tests {
     #[test]
     fn test_to_iso8601_utc() {
         let tz = FixedOffset::east_opt(0).unwrap();
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00+00:00");
     }
 
     #[test]
     fn test_to_iso8601_positive_offset() {
         let tz = FixedOffset::east_opt(5 * 3600 + 30 * 60).unwrap(); // UTC+5:30 (India)
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00+05:30");
     }
 
     #[test]
     fn test_to_iso8601_negative_offset() {
         let tz = FixedOffset::west_opt(6 * 3600).unwrap(); // UTC-6 (CST)
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_iso8601(datetime), "2026-02-22T14:30:00-06:00");
     }
 
@@ -184,21 +193,30 @@ mod tests {
     #[test]
     fn test_to_rfc2822_utc() {
         let tz = FixedOffset::east_opt(0).unwrap();
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 +0000");
     }
 
     #[test]
     fn test_to_rfc2822_positive_offset() {
         let tz = FixedOffset::east_opt(5 * 3600 + 30 * 60).unwrap(); // UTC+5:30 (India)
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 +0530");
     }
 
     #[test]
     fn test_to_rfc2822_negative_offset() {
         let tz = FixedOffset::west_opt(6 * 3600).unwrap(); // UTC-6 (CST)
-        let datetime = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+        let datetime = tz
+            .with_ymd_and_hms(2026, 2, 22, 14, 30, 0)
+            .single()
+            .unwrap();
         assert_eq!(to_rfc2822(datetime), "Sun, 22 Feb 2026 14:30:00 -0600");
     }
 
