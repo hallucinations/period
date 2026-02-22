@@ -17,7 +17,11 @@ use crate::relative::types::Relative;
 #[inline]
 pub fn years_ago(years: i64) -> Result<Relative, PeriodError> {
     validate_non_negative(years, "years", "years_from_now")?;
-    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| PeriodError::Overflow {
+    let months_i64 = years.checked_mul(12).ok_or(PeriodError::Overflow {
+        unit: "years",
+        value: years,
+    })?;
+    let months = u32::try_from(months_i64).map_err(|_| PeriodError::Overflow {
         unit: "years",
         value: years,
     })?;
@@ -43,7 +47,11 @@ pub fn years_ago(years: i64) -> Result<Relative, PeriodError> {
 #[inline]
 pub fn years_from_now(years: i64) -> Result<Relative, PeriodError> {
     validate_non_negative(years, "years", "years_ago")?;
-    let months = u32::try_from(years.saturating_mul(12)).map_err(|_| PeriodError::Overflow {
+    let months_i64 = years.checked_mul(12).ok_or(PeriodError::Overflow {
+        unit: "years",
+        value: years,
+    })?;
+    let months = u32::try_from(months_i64).map_err(|_| PeriodError::Overflow {
         unit: "years",
         value: years,
     })?;
