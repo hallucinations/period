@@ -106,13 +106,21 @@ pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
 #[must_use]
 pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_from_now")?;
-    months_ago(years.saturating_mul(12))
+    let months = i32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
+        unit: "months".to_string(),
+        value: years.saturating_mul(12),
+    })?;
+    Ok(Local::now().date_naive() - Months::new(months as u32))
 }
 
 #[must_use]
 pub fn years_from_now(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_ago")?;
-    months_from_now(years.saturating_mul(12))
+    let months = i32::try_from(years.saturating_mul(12)).map_err(|_| TempusError::Overflow {
+        unit: "months".to_string(),
+        value: years.saturating_mul(12),
+    })?;
+    Ok(Local::now().date_naive() + Months::new(months as u32))
 }
 
 #[cfg(test)]
