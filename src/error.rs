@@ -3,6 +3,7 @@ use std::fmt;
 #[derive(Debug, PartialEq)]
 pub enum TempusError {
     NegativeValue { unit: String, suggestion: String, value: i64 },
+    Overflow { unit: String, value: i64 },
 }
 
 impl fmt::Display for TempusError {
@@ -14,6 +15,9 @@ impl fmt::Display for TempusError {
                     "{} must be positive. Did you mean {}({})?",
                     unit, suggestion, value
                 )
+            }
+            TempusError::Overflow { unit, value } => {
+                write!(f, "{} value {} is too large", unit, value)
             }
         }
     }
