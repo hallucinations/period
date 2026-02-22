@@ -1,7 +1,11 @@
-use chrono::{DateTime, Duration, Local, Months, NaiveDate};
 use crate::error::TempusError;
+use chrono::{DateTime, Duration, Local, Months, NaiveDate};
 
-fn validate_positive(value: i64, unit: &'static str, suggestion: &'static str) -> Result<(), TempusError> {
+fn validate_positive(
+    value: i64,
+    unit: &'static str,
+    suggestion: &'static str,
+) -> Result<(), TempusError> {
     if value < 0 {
         return Err(TempusError::NegativeValue {
             unit,
