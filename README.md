@@ -40,8 +40,10 @@ Add Period to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-period = "0.1"
+period = "0.6.0-alpha.1"
 ```
+
+> This is a pre-release. Pin the exact version — no stability guarantees are made between alpha releases.
 
 ---
 
@@ -159,6 +161,29 @@ let label = humanize(hours_ago(3)?.as_datetime()); // "3 hours ago"
 >
 > **Note:** `"yesterday"` / `"tomorrow"` are triggered by elapsed seconds (22–35 h),
 > not by calendar-day boundaries. Months are approximated as 30 days.
+
+### Formatting
+
+Convert dates and datetimes to common string formats.
+
+```rust
+use period::{to_date_string, to_long_date, to_iso8601, to_rfc2822};
+use chrono::{FixedOffset, NaiveDate, TimeZone};
+
+let date = NaiveDate::from_ymd_opt(2026, 2, 22).unwrap();
+to_date_string(date);  // "2026-02-22"
+to_long_date(date);    // "February 22, 2026"
+
+let tz = FixedOffset::east_opt(5 * 3600 + 30 * 60).unwrap(); // UTC+5:30
+let dt  = tz.with_ymd_and_hms(2026, 2, 22, 14, 30, 0).single().unwrap();
+to_iso8601(dt);        // "2026-02-22T14:30:00+05:30"
+to_rfc2822(dt);        // "Sun, 22 Feb 2026 14:30:00 +0530"
+```
+
+`to_iso8601` and `to_rfc2822` accept any timezone — `Local`, `Utc`, `FixedOffset`, etc.
+
+> **Note:** `to_long_date` uses `%e` (space-padded day), so single-digit days
+> produce two spaces: `"February  5, 2026"`.
 
 ---
 
