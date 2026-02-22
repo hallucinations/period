@@ -1,6 +1,8 @@
 mod now;
 mod relative;
+pub mod error;
 
+pub use error::TempusError;
 pub use now::{now, today};
 pub use relative::{
     seconds_ago, seconds_from_now,

@@ -1,89 +1,91 @@
 use chrono::{DateTime, Duration, Local, Months, NaiveDate};
+use crate::error::TempusError;
 
-fn validate_positive(value: i64, unit: &str, suggestion: &str) -> Result<(), String> {
+fn validate_positive(value: i64, unit: &str, suggestion: &str) -> Result<(), TempusError> {
     if value < 0 {
-        return Err(format!(
-            "{} must be positive. Did you mean {}({})?",
-            unit, suggestion, value.abs()
-        ));
+        return Err(TempusError::NegativeValue {
+            unit: unit.to_string(),
+            suggestion: suggestion.to_string(),
+            value: -value,
+        });
     }
     Ok(())
 }
 
-pub fn seconds_ago(seconds: i64) -> Result<DateTime<Local>, String> {
+pub fn seconds_ago(seconds: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(seconds, "seconds", "seconds_from_now")?;
     Ok(Local::now() - Duration::seconds(seconds))
 }
 
-pub fn seconds_from_now(seconds: i64) -> Result<DateTime<Local>, String> {
+pub fn seconds_from_now(seconds: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(seconds, "seconds", "seconds_ago")?;
     Ok(Local::now() + Duration::seconds(seconds))
 }
 
-pub fn minutes_ago(minutes: i64) -> Result<DateTime<Local>, String> {
+pub fn minutes_ago(minutes: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(minutes, "minutes", "minutes_from_now")?;
     Ok(Local::now() - Duration::minutes(minutes))
 }
 
-pub fn minutes_from_now(minutes: i64) -> Result<DateTime<Local>, String> {
+pub fn minutes_from_now(minutes: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(minutes, "minutes", "minutes_ago")?;
     Ok(Local::now() + Duration::minutes(minutes))
 }
 
-pub fn hours_ago(hours: i64) -> Result<DateTime<Local>, String> {
+pub fn hours_ago(hours: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(hours, "hours", "hours_from_now")?;
     Ok(Local::now() - Duration::hours(hours))
 }
 
-pub fn hours_from_now(hours: i64) -> Result<DateTime<Local>, String> {
+pub fn hours_from_now(hours: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(hours, "hours", "hours_ago")?;
     Ok(Local::now() + Duration::hours(hours))
 }
 
-pub fn days_ago(days: i64) -> Result<NaiveDate, String> {
+pub fn days_ago(days: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(days, "days", "days_from_now")?;
     Ok(Local::now().date_naive() - Duration::days(days))
 }
 
-pub fn days_from_now(days: i64) -> Result<NaiveDate, String> {
+pub fn days_from_now(days: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(days, "days", "days_ago")?;
     Ok(Local::now().date_naive() + Duration::days(days))
 }
 
-pub fn weeks_ago(weeks: i64) -> Result<NaiveDate, String> {
+pub fn weeks_ago(weeks: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(weeks, "weeks", "weeks_from_now")?;
     Ok(Local::now().date_naive() - Duration::weeks(weeks))
 }
 
-pub fn weeks_from_now(weeks: i64) -> Result<NaiveDate, String> {
+pub fn weeks_from_now(weeks: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(weeks, "weeks", "weeks_ago")?;
     Ok(Local::now().date_naive() + Duration::weeks(weeks))
 }
 
 pub fn yesterday() -> NaiveDate {
-    days_ago(1).unwrap()
+    Local::now().date_naive() - Duration::days(1)
 }
 
 pub fn tomorrow() -> NaiveDate {
-    days_from_now(1).unwrap()
+    Local::now().date_naive() + Duration::days(1)
 }
 
-pub fn months_ago(months: i64) -> Result<NaiveDate, String> {
+pub fn months_ago(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_from_now")?;
     Ok(Local::now().date_naive() - Months::new(months as u32))
 }
 
-pub fn months_from_now(months: i64) -> Result<NaiveDate, String> {
+pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_ago")?;
     Ok(Local::now().date_naive() + Months::new(months as u32))
 }
 
-pub fn years_ago(years: i64) -> Result<NaiveDate, String> {
+pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_from_now")?;
     months_ago(years.saturating_mul(12))
 }
 
-pub fn years_from_now(years: i64) -> Result<NaiveDate, String> {
+pub fn years_from_now(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_ago")?;
     months_from_now(years.saturating_mul(12))
 }
@@ -116,7 +118,7 @@ mod tests {
     #[test]
     fn test_seconds_ago_negative_returns_error() {
         assert_eq!(
-            seconds_ago(-3).unwrap_err(),
+            seconds_ago(-3).unwrap_err().to_string(),
             "seconds must be positive. Did you mean seconds_from_now(3)?"
         );
     }
@@ -144,7 +146,7 @@ mod tests {
     #[test]
     fn test_seconds_from_now_negative_returns_error() {
         assert_eq!(
-            seconds_from_now(-3).unwrap_err(),
+            seconds_from_now(-3).unwrap_err().to_string(),
             "seconds must be positive. Did you mean seconds_ago(3)?"
         );
     }
@@ -172,7 +174,7 @@ mod tests {
     #[test]
     fn test_minutes_ago_negative_returns_error() {
         assert_eq!(
-            minutes_ago(-3).unwrap_err(),
+            minutes_ago(-3).unwrap_err().to_string(),
             "minutes must be positive. Did you mean minutes_from_now(3)?"
         );
     }
@@ -200,7 +202,7 @@ mod tests {
     #[test]
     fn test_minutes_from_now_negative_returns_error() {
         assert_eq!(
-            minutes_from_now(-3).unwrap_err(),
+            minutes_from_now(-3).unwrap_err().to_string(),
             "minutes must be positive. Did you mean minutes_ago(3)?"
         );
     }
@@ -228,7 +230,7 @@ mod tests {
     #[test]
     fn test_hours_ago_negative_returns_error() {
         assert_eq!(
-            hours_ago(-3).unwrap_err(),
+            hours_ago(-3).unwrap_err().to_string(),
             "hours must be positive. Did you mean hours_from_now(3)?"
         );
     }
@@ -256,7 +258,7 @@ mod tests {
     #[test]
     fn test_hours_from_now_negative_returns_error() {
         assert_eq!(
-            hours_from_now(-3).unwrap_err(),
+            hours_from_now(-3).unwrap_err().to_string(),
             "hours must be positive. Did you mean hours_ago(3)?"
         );
     }
@@ -276,7 +278,7 @@ mod tests {
     #[test]
     fn test_days_ago_negative_returns_error() {
         assert_eq!(
-            days_ago(-3).unwrap_err(),
+            days_ago(-3).unwrap_err().to_string(),
             "days must be positive. Did you mean days_from_now(3)?"
         );
     }
@@ -296,7 +298,7 @@ mod tests {
     #[test]
     fn test_days_from_now_negative_returns_error() {
         assert_eq!(
-            days_from_now(-3).unwrap_err(),
+            days_from_now(-3).unwrap_err().to_string(),
             "days must be positive. Did you mean days_ago(3)?"
         );
     }
@@ -316,7 +318,7 @@ mod tests {
     #[test]
     fn test_weeks_ago_negative_returns_error() {
         assert_eq!(
-            weeks_ago(-2).unwrap_err(),
+            weeks_ago(-2).unwrap_err().to_string(),
             "weeks must be positive. Did you mean weeks_from_now(2)?"
         );
     }
@@ -336,7 +338,7 @@ mod tests {
     #[test]
     fn test_weeks_from_now_negative_returns_error() {
         assert_eq!(
-            weeks_from_now(-2).unwrap_err(),
+            weeks_from_now(-2).unwrap_err().to_string(),
             "weeks must be positive. Did you mean weeks_ago(2)?"
         );
     }
@@ -370,7 +372,7 @@ mod tests {
     #[test]
     fn test_months_ago_negative_returns_error() {
         assert_eq!(
-            months_ago(-2).unwrap_err(),
+            months_ago(-2).unwrap_err().to_string(),
             "months must be positive. Did you mean months_from_now(2)?"
         );
     }
@@ -390,7 +392,7 @@ mod tests {
     #[test]
     fn test_months_from_now_negative_returns_error() {
         assert_eq!(
-            months_from_now(-2).unwrap_err(),
+            months_from_now(-2).unwrap_err().to_string(),
             "months must be positive. Did you mean months_ago(2)?"
         );
     }
@@ -410,7 +412,7 @@ mod tests {
     #[test]
     fn test_years_ago_negative_returns_error() {
         assert_eq!(
-            years_ago(-2).unwrap_err(),
+            years_ago(-2).unwrap_err().to_string(),
             "years must be positive. Did you mean years_from_now(2)?"
         );
     }
@@ -430,7 +432,7 @@ mod tests {
     #[test]
     fn test_years_from_now_negative_returns_error() {
         assert_eq!(
-            years_from_now(-2).unwrap_err(),
+            years_from_now(-2).unwrap_err().to_string(),
             "years must be positive. Did you mean years_ago(2)?"
         );
     }
