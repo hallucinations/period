@@ -1,4 +1,4 @@
-# CLAUDE.md
+# Copilot Instructions
 
 This file provides context for AI assistants working in this repository.
 
@@ -24,7 +24,7 @@ period/
 ├── .github/
 │   ├── workflows/
 │   │   └── ci.yml                 # CI pipeline (test, lint, docs, MSRV)
-│   └── copilot-instructions.md    # GitHub Copilot instructions (mirrors this file)
+│   └── copilot-instructions.md    # GitHub Copilot instructions (mirrors CLAUDE.md)
 ├── Cargo.toml
 ├── Cargo.lock        # Intentionally committed (library crate)
 ├── rust-toolchain.toml
