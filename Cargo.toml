@@ -8,7 +8,7 @@ keywords = ["date", "time", "datetime", "chrono", "relative"]
 categories = ["date-and-time"]
 readme = "README.md"
 repository = "https://github.com/vasanth/tempus"
-rust-version = "1.85"
+rust-version = "1.93"
 
 [dependencies]
 chrono = "0.4"
