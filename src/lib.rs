@@ -4,7 +4,7 @@ mod now;
 mod relative;
 
 pub use error::PeriodError;
-pub use formatting::{to_date_string, to_iso8601, to_long_date, to_rfc2822};
+pub use formatting::{to_date_string, to_iso8601, to_long_date, to_rfc2822, to_short_date};
 pub use now::{now, today};
 pub use relative::{
     Relative, days_ago, days_from_now, hours_ago, hours_from_now, humanize, minutes_ago,

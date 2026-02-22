@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDate, TimeZone};
+use chrono::{DateTime, Datelike, NaiveDate, TimeZone};
 
 /// Converts a [`NaiveDate`] to an ISO 8601 date string (`YYYY-MM-DD`).
 #[must_use]
@@ -9,12 +9,22 @@ pub fn to_date_string(date: NaiveDate) -> String {
 
 /// Converts a [`NaiveDate`] to a long-form date string (e.g. `"February 22, 2026"`).
 ///
-/// Uses `%e` for the day, which space-pads single-digit days (`"February  5, 2026"`).
+/// Single-digit days are not padded: `"February 5, 2026"`, not `"February  5, 2026"`.
 /// Output is always in English regardless of system locale.
 #[must_use]
 #[inline]
 pub fn to_long_date(date: NaiveDate) -> String {
-    date.format("%B %e, %Y").to_string()
+    format!("{} {}, {}", date.format("%B"), date.day(), date.format("%Y"))
+}
+
+/// Converts a [`NaiveDate`] to a short-form date string (e.g. `"Feb 22, 2026"`).
+///
+/// Single-digit days are not padded: `"Feb 5, 2026"`, not `"Feb  5, 2026"`.
+/// Output is always in English regardless of system locale.
+#[must_use]
+#[inline]
+pub fn to_short_date(date: NaiveDate) -> String {
+    format!("{} {}, {}", date.format("%b"), date.day(), date.format("%Y"))
 }
 
 /// Converts a [`DateTime`] to an RFC 3339 / ISO 8601 string
@@ -78,15 +88,14 @@ mod tests {
 
     #[test]
     fn test_to_long_date_single_digit_day() {
-        // %e space-pads single-digit days
         let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
-        assert_eq!(to_long_date(date), "February  5, 2026");
+        assert_eq!(to_long_date(date), "February 5, 2026");
     }
 
     #[test]
     fn test_to_long_date_january() {
         let date = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
-        assert_eq!(to_long_date(date), "January  1, 2026");
+        assert_eq!(to_long_date(date), "January 1, 2026");
     }
 
     #[test]
@@ -99,6 +108,38 @@ mod tests {
     fn test_to_long_date_leap_day() {
         let date = NaiveDate::from_ymd_opt(2028, 2, 29).unwrap();
         assert_eq!(to_long_date(date), "February 29, 2028");
+    }
+
+    // -- to_short_date --------------------------------------------------------
+
+    #[test]
+    fn test_to_short_date() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 22).unwrap();
+        assert_eq!(to_short_date(date), "Feb 22, 2026");
+    }
+
+    #[test]
+    fn test_to_short_date_single_digit_day() {
+        let date = NaiveDate::from_ymd_opt(2026, 2, 5).unwrap();
+        assert_eq!(to_short_date(date), "Feb 5, 2026");
+    }
+
+    #[test]
+    fn test_to_short_date_january() {
+        let date = NaiveDate::from_ymd_opt(2026, 1, 1).unwrap();
+        assert_eq!(to_short_date(date), "Jan 1, 2026");
+    }
+
+    #[test]
+    fn test_to_short_date_year_end() {
+        let date = NaiveDate::from_ymd_opt(2026, 12, 31).unwrap();
+        assert_eq!(to_short_date(date), "Dec 31, 2026");
+    }
+
+    #[test]
+    fn test_to_short_date_leap_day() {
+        let date = NaiveDate::from_ymd_opt(2028, 2, 29).unwrap();
+        assert_eq!(to_short_date(date), "Feb 29, 2028");
     }
 
     // -- to_iso8601 -----------------------------------------------------------
