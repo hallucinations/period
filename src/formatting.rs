@@ -14,7 +14,12 @@ pub fn to_date_string(date: NaiveDate) -> String {
 #[must_use]
 #[inline]
 pub fn to_long_date(date: NaiveDate) -> String {
-    format!("{} {}, {}", date.format("%B"), date.day(), date.format("%Y"))
+    format!(
+        "{} {}, {}",
+        date.format("%B"),
+        date.day(),
+        date.format("%Y")
+    )
 }
 
 /// Converts a [`NaiveDate`] to a short-form date string (e.g. `"Feb 22, 2026"`).
@@ -24,7 +29,12 @@ pub fn to_long_date(date: NaiveDate) -> String {
 #[must_use]
 #[inline]
 pub fn to_short_date(date: NaiveDate) -> String {
-    format!("{} {}, {}", date.format("%b"), date.day(), date.format("%Y"))
+    format!(
+        "{} {}, {}",
+        date.format("%b"),
+        date.day(),
+        date.format("%Y")
+    )
 }
 
 /// Converts a [`DateTime`] to an RFC 3339 / ISO 8601 string
