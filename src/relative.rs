@@ -23,7 +23,6 @@ fn validate_positive(
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `seconds` is negative.
 /// Use [`seconds_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn seconds_ago(seconds: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(seconds, "seconds", "seconds_from_now")?;
@@ -37,7 +36,6 @@ pub fn seconds_ago(seconds: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `seconds` is negative.
 /// Use [`seconds_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn seconds_from_now(seconds: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(seconds, "seconds", "seconds_ago")?;
@@ -51,7 +49,6 @@ pub fn seconds_from_now(seconds: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `minutes` is negative.
 /// Use [`minutes_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn minutes_ago(minutes: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(minutes, "minutes", "minutes_from_now")?;
@@ -65,7 +62,6 @@ pub fn minutes_ago(minutes: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `minutes` is negative.
 /// Use [`minutes_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn minutes_from_now(minutes: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(minutes, "minutes", "minutes_ago")?;
@@ -79,7 +75,6 @@ pub fn minutes_from_now(minutes: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `hours` is negative.
 /// Use [`hours_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn hours_ago(hours: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(hours, "hours", "hours_from_now")?;
@@ -93,7 +88,6 @@ pub fn hours_ago(hours: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `hours` is negative.
 /// Use [`hours_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn hours_from_now(hours: i64) -> Result<DateTime<Local>, TempusError> {
     validate_positive(hours, "hours", "hours_ago")?;
@@ -107,7 +101,6 @@ pub fn hours_from_now(hours: i64) -> Result<DateTime<Local>, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `days` is negative.
 /// Use [`days_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn days_ago(days: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(days, "days", "days_from_now")?;
@@ -121,7 +114,6 @@ pub fn days_ago(days: i64) -> Result<NaiveDate, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `days` is negative.
 /// Use [`days_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn days_from_now(days: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(days, "days", "days_ago")?;
@@ -135,7 +127,6 @@ pub fn days_from_now(days: i64) -> Result<NaiveDate, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `weeks` is negative.
 /// Use [`weeks_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn weeks_ago(weeks: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(weeks, "weeks", "weeks_from_now")?;
@@ -149,7 +140,6 @@ pub fn weeks_ago(weeks: i64) -> Result<NaiveDate, TempusError> {
 /// # Errors
 /// Returns [`TempusError::NegativeValue`] if `weeks` is negative.
 /// Use [`weeks_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn weeks_from_now(weeks: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(weeks, "weeks", "weeks_ago")?;
@@ -178,7 +168,6 @@ pub fn tomorrow() -> NaiveDate {
 /// Returns [`TempusError::NegativeValue`] if `months` is negative.
 /// Returns [`TempusError::Overflow`] if `months` exceeds [`u32::MAX`].
 /// Use [`months_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn months_ago(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_from_now")?;
@@ -197,7 +186,6 @@ pub fn months_ago(months: i64) -> Result<NaiveDate, TempusError> {
 /// Returns [`TempusError::NegativeValue`] if `months` is negative.
 /// Returns [`TempusError::Overflow`] if `months` exceeds [`u32::MAX`].
 /// Use [`months_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(months, "months", "months_ago")?;
@@ -216,7 +204,6 @@ pub fn months_from_now(months: i64) -> Result<NaiveDate, TempusError> {
 /// Returns [`TempusError::NegativeValue`] if `years` is negative.
 /// Returns [`TempusError::Overflow`] if the equivalent month count overflows.
 /// Use [`years_from_now`] for future offsets.
-#[must_use]
 #[inline]
 pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_from_now")?;
@@ -235,7 +222,6 @@ pub fn years_ago(years: i64) -> Result<NaiveDate, TempusError> {
 /// Returns [`TempusError::NegativeValue`] if `years` is negative.
 /// Returns [`TempusError::Overflow`] if the equivalent month count overflows.
 /// Use [`years_ago`] for past offsets.
-#[must_use]
 #[inline]
 pub fn years_from_now(years: i64) -> Result<NaiveDate, TempusError> {
     validate_positive(years, "years", "years_ago")?;
