@@ -1,8 +1,10 @@
+mod date;
 mod error;
 mod formatting;
 mod now;
 mod relative;
 
+pub use date::{day_of_year, days_in_month, is_weekday, is_weekend, week_of_year};
 pub use error::PeriodError;
 pub use formatting::{to_date_string, to_iso8601, to_long_date, to_rfc2822, to_short_date};
 pub use now::{now, today};
